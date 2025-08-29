@@ -11,7 +11,7 @@ import ru.yandex.practicum.collector.model.enums.SensorEventType;
 public class MotionSensorEvent extends SensorEvent {
 
     int linkQuality;
-    boolean motion;
+    Boolean motion;
     int voltage;
 
     @Override

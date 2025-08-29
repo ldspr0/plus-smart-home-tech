@@ -10,7 +10,7 @@ import ru.yandex.practicum.collector.model.enums.SensorEventType;
 @ToString(callSuper = true)
 public class SwitchSensorEvent extends SensorEvent {
 
-    boolean state;
+    Boolean state;
 
     @Override
     public SensorEventType getType() {
