@@ -1,11 +1,10 @@
 package ru.yandex.practicum.collector.producers.hub;
 
-import org.apache.avro.specific.SpecificRecordBase;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.collector.model.enums.DeviceType;
 import ru.yandex.practicum.collector.producers.KafkaProducer;
-import ru.yandex.practicum.collector.model.hub.HubEvent;
-import ru.yandex.practicum.collector.model.hub.DeviceAddedEvent;
+import ru.yandex.practicum.grpc.telemetry.event.DeviceAddedEventProto;
+import ru.yandex.practicum.grpc.telemetry.event.DeviceTypeProto;
+import ru.yandex.practicum.grpc.telemetry.event.HubEventProto;
 import ru.yandex.practicum.kafka.telemetry.event.DeviceAddedEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.DeviceTypeAvro;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
@@ -17,17 +16,22 @@ public class DeviceAddedProducer extends BaseHubProducer {
     }
 
     @Override
-    public SpecificRecordBase toAvro(HubEvent hubEvent) {
-        DeviceAddedEvent event = (DeviceAddedEvent) hubEvent;
+    public HubEventAvro toAvro(HubEventProto hubEvent) {
+        DeviceAddedEventProto deviceAddedEvent = hubEvent.getDeviceAdded();
 
         return HubEventAvro.newBuilder()
                 .setHubId(hubEvent.getHubId())
-                .setTimestamp(hubEvent.getTimestamp())
-                .setPayload(new DeviceAddedEventAvro(event.getId(), mapToDeviceTypeAvro(event.getDeviceType())))
+                .setTimestamp(mapTimestampToInstant(hubEvent))
+                .setPayload(new DeviceAddedEventAvro(deviceAddedEvent.getId(), mapToDeviceTypeAvro(deviceAddedEvent.getDeviceType())))
                 .build();
     }
 
-    private DeviceTypeAvro mapToDeviceTypeAvro(DeviceType deviceType) {
+    @Override
+    public HubEventProto.PayloadCase getMessageType() {
+        return HubEventProto.PayloadCase.DEVICE_ADDED;
+    }
+
+    private DeviceTypeAvro mapToDeviceTypeAvro(DeviceTypeProto deviceType) {
         DeviceTypeAvro type = null;
 
         switch (deviceType) {
@@ -37,6 +41,7 @@ public class DeviceAddedProducer extends BaseHubProducer {
             case CLIMATE_SENSOR -> type = DeviceTypeAvro.CLIMATE_SENSOR;
             case TEMPERATURE_SENSOR -> type = DeviceTypeAvro.TEMPERATURE_SENSOR;
         }
+
         return type;
     }
 }
