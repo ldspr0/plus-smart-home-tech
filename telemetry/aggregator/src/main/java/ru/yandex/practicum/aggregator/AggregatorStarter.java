@@ -42,12 +42,12 @@ public class AggregatorStarter {
                 ConsumerRecords<String, SpecificRecordBase> records = consumer.poll(Duration.ofMillis(1000));
 
                 for (ConsumerRecord<String, SpecificRecordBase> record : records) {
-                    log.info("Обработка полученных данных {}", record.value());
+                    log.info("Incoming data: {}", record.value());
                     SensorEventAvro event = (SensorEventAvro) record.value();
                     Optional<SensorsSnapshotAvro> snapshot = sensorEventHandler.updateState(event);
-                    log.info("Получение снимка состояния {}", snapshot);
+                    log.info("Snapshot data: {}", snapshot);
                     if (snapshot.isPresent()) {
-                        log.info("Запись снимка в топик Kafka");
+                        log.info("Move snapshot to Kafka");
                         ProducerRecord<String, SpecificRecordBase> message = new ProducerRecord<>(snapshotsTopic,
                                 null, event.getTimestamp().toEpochMilli(), event.getHubId(), snapshot.get());
 
@@ -58,15 +58,15 @@ public class AggregatorStarter {
             }
         } catch (WakeupException ignored) {
         } catch (Exception e) {
-            log.error("Ошибка во время обработки событий от датчиков", e);
+            log.error("Error with messages: ", e);
         } finally {
             try {
                 producer.flush();
                 consumer.commitSync();
             } finally {
-                log.info("Закрываем консьюмер");
+                log.info("Close Consumer");
                 consumer.close();
-                log.info("Закрываем продюсер");
+                log.info("Close Producer");
                 producer.close();
             }
         }
