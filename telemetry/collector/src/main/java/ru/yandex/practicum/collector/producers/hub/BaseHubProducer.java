@@ -23,7 +23,7 @@ public abstract class BaseHubProducer implements HubEventProducer {
     @Override
     public void builder(HubEventProto event) {
         var contract = toAvro(event);
-        log.info("Отправляем событие хаба {}", contract);
+        log.info("Send hub event {}", contract);
         producer.send(toAvro(event), event.getHubId(), mapTimestampToInstant(event), topic);
     }
 

@@ -43,7 +43,7 @@ public class CollectorController extends CollectorControllerGrpc.CollectorContro
             if (sensorEventProducers.containsKey(request.getPayloadCase())) {
                 sensorEventProducers.get(request.getPayloadCase()).builder(request);
             } else {
-                throw new IllegalArgumentException("Не могу найти обработчик для события " + request.getPayloadCase());
+                throw new IllegalArgumentException("Can't find event handler " + request.getPayloadCase());
             }
             responseObserver.onNext(CollectorResponse.getDefaultInstance());
             responseObserver.onCompleted();
@@ -60,7 +60,7 @@ public class CollectorController extends CollectorControllerGrpc.CollectorContro
             if (hubEventProducers.containsKey(request.getPayloadCase())) {
                 hubEventProducers.get(request.getPayloadCase()).builder(request);
             } else {
-                throw new IllegalArgumentException("Не могу найти обработчик для события " + request.getPayloadCase());
+                throw new IllegalArgumentException("Can't find event handler " + request.getPayloadCase());
             }
             responseObserver.onNext(CollectorResponse.getDefaultInstance());
             responseObserver.onCompleted();

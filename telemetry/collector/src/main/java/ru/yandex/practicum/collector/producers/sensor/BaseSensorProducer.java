@@ -22,7 +22,7 @@ public abstract class BaseSensorProducer implements SensorEventProducer {
     @Override
     public void builder(SensorEventProto event) {
         var contract = toAvro(event);
-        log.info("Отправляем событие сенсора {}", contract);
+        log.info("Send sensor event {}", contract);
         producer.send(contract, event.getHubId(), mapTimestampToInstant(event), topic);
     }
 
