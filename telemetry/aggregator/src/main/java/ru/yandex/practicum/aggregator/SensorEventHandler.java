@@ -1,5 +1,6 @@
 package ru.yandex.practicum.aggregator;
 
+
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorStateAvro;
