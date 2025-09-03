@@ -1,14 +1,9 @@
 spring:
   application:
     name: aggregator
-  config:
-    import: "configserver:"
   cloud:
     config:
-      fail-fast: true
+      uri: http://localhost:8888
+      fail-fast: false
       discovery:
-        enabled: true
-        serviceId: config-server
-      retry:
-        useRandomPolicy: true
-        max-interval: 6000
+        enabled: false
