@@ -1,4 +1,5 @@
 package ru.yandex.practicum.aggregator;
+
 import lombok.RequiredArgsConstructor;
 import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
