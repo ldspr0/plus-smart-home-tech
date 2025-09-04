@@ -1,10 +1,9 @@
 package ru.yandex.practicum.collector.producers.sensor;
 
-import org.apache.avro.specific.SpecificRecordBase;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.collector.producers.KafkaProducer;
-import ru.yandex.practicum.collector.model.sensor.SensorEvent;
-import ru.yandex.practicum.collector.model.sensor.MotionSensorEvent;
+import ru.yandex.practicum.grpc.telemetry.event.MotionSensorProto;
+import ru.yandex.practicum.grpc.telemetry.event.SensorEventProto;
 import ru.yandex.practicum.kafka.telemetry.event.MotionSensorAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 
@@ -15,14 +14,19 @@ public class MotionSensorProducer extends BaseSensorProducer {
     }
 
     @Override
-    public SpecificRecordBase toAvro(SensorEvent sensorEvent) {
-        MotionSensorEvent event = (MotionSensorEvent) sensorEvent;
+    public SensorEventAvro toAvro(SensorEventProto sensorEvent) {
+        MotionSensorProto motionSensor = sensorEvent.getMotionSensorEvent();
 
         return SensorEventAvro.newBuilder()
                 .setId(sensorEvent.getId())
                 .setHubId(sensorEvent.getHubId())
-                .setTimestamp(sensorEvent.getTimestamp())
-                .setPayload(new MotionSensorAvro(event.getLinkQuality(), event.getMotion(), event.getVoltage()))
+                .setTimestamp(mapTimestampToInstant(sensorEvent))
+                .setPayload(new MotionSensorAvro(motionSensor.getLinkQuality(), motionSensor.getMotion(), motionSensor.getVoltage()))
                 .build();
+    }
+
+    @Override
+    public SensorEventProto.PayloadCase getMessageType() {
+        return SensorEventProto.PayloadCase.MOTION_SENSOR_EVENT;
     }
 }
