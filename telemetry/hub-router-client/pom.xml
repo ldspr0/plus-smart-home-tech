@@ -11,6 +11,10 @@
 
     <artifactId>hub-router-client</artifactId>
 
+    <properties>
+        <proto-schemas.version>1.0-SNAPSHOT</proto-schemas.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -20,7 +24,7 @@
         <dependency>
             <groupId>ru.yandex.practicum</groupId>
             <artifactId>proto-schemas</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${proto-schemas.version}</version>
         </dependency>
 
         <dependency>
