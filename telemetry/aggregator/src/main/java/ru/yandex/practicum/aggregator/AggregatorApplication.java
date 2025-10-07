@@ -1,0 +1,19 @@
+package ru.yandex.practicum.aggregator;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
+import org.springframework.context.ConfigurableApplicationContext;
+
+@SpringBootApplication
+@ConfigurationPropertiesScan
+public class AggregatorApplication {
+
+    public static void main(String[] args) {
+        ConfigurableApplicationContext context = SpringApplication.run(AggregatorApplication.class, args);
+
+        // Получаем бин AggregationStarter из контекста и запускаем основную логику сервиса
+        AggregatorStarter aggregator = context.getBean(AggregatorStarter.class);
+        aggregator.start();
+    }
+}
