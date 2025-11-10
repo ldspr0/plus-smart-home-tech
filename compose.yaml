@@ -2,8 +2,6 @@ services:
   db:
     image: postgres:16.1
     container_name: db
-    #    networks:
-    #      - net
     ports:
       - "5432:5432"
     environment:
@@ -17,8 +15,8 @@ services:
     ports:
       - "6432:5432"
     environment:
-      - POSTGRES_PASSWORD=store
-      - POSTGRES_USER=store
+      - POSTGRES_PASSWORD=shopstore
+      - POSTGRES_USER=shopstore
       - POSTGRES_DB=store-db
 
   cart-db:
