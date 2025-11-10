@@ -1,0 +1,14 @@
+spring:
+  config:
+    import: "configserver:"
+  application:
+    name: shopping-cart
+  cloud:
+    config:
+      fail-fast: true
+      discovery:
+        enabled: true
+        service-id: config-server
+      retry:
+        useRandomPolicy: true
+        max-interval: 6000
