@@ -1,6 +1,7 @@
 package ru.yandex.practicum.shoppingcart.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.interactionapi.dto.BookedProductsDto;
@@ -22,6 +23,7 @@ import java.util.UUID;
 public class ShoppingCartServiceImpl implements ShoppingCartService {
     private final ShoppingCartRepository shoppingCartRepository;
     private final ShoppingCartMapper shoppingCartMapper;
+    @Lazy
     private final WarehouseClient warehouseClient;
 
     @Override
