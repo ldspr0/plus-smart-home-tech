@@ -1,9 +1,9 @@
-drop table if exists warehouse_product, bookings, booking_products;
+drop table if exists booking_products, bookings, warehouse_product;
 
 create table if not exists warehouse_product
 (
     product_id uuid primary key,
-    quantity   integer,
+    quantity   integer default 0,
     fragile    boolean,
     width      double precision not null,
     height     double precision not null,
@@ -22,7 +22,8 @@ create table if not exists bookings
 
 create table if not exists booking_products
 (
-    shopping_cart_id uuid references bookings (shopping_cart_id) on delete cascade primary key,
+    shopping_cart_id uuid references bookings (shopping_cart_id) on delete cascade,
     product_id       uuid not null,
-    quantity         integer
+    quantity         integer,
+    primary key (shopping_cart_id, product_id)  -- Правильный составной ключ
 );
