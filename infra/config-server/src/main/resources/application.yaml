@@ -1,3 +1,6 @@
+server:
+  port: 8080
+
 spring:
   application:
     name: config-server
@@ -10,7 +13,11 @@ spring:
           searchLocations:
             - classpath:config/telemetry/{application}
             - classpath:config/commerce/{application}
+      discovery:
+        enabled: false
+
 eureka:
   client:
+    enabled: false
     serviceUrl:
       defaultZone: http://${eureka.instance.hostname:localhost}:${eureka.instance.port:8761}/eureka/
