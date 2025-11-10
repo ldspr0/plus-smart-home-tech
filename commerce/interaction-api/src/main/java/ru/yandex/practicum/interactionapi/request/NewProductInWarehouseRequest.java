@@ -16,6 +16,9 @@ import java.util.UUID;
 public class NewProductInWarehouseRequest {
     @NotNull
     UUID productId;
+    @NotNull
+    @Min(0)
+    Long quantity;
     Boolean fragile;
     @NotNull
     DimensionDto dimension;
