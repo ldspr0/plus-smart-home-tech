@@ -6,12 +6,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.interactionapi.dto.PageableDto;
+import ru.yandex.practicum.interactionapi.enums.QuantityState;
 import ru.yandex.practicum.interactionapi.request.SetProductQuantityStateRequest;
 import ru.yandex.practicum.interactionapi.dto.ProductDto;
 import ru.yandex.practicum.interactionapi.enums.ProductCategory;
 import ru.yandex.practicum.shoppingstore.service.ShoppingStoreService;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Slf4j
@@ -48,9 +50,14 @@ public class ShoppingStoreController {
     }
 
     @PostMapping("/quantityState")
-    public Boolean setProductQuantityState(@RequestBody @Valid SetProductQuantityStateRequest setProductQuantityStateRequest) {
-        log.info("Set Product quantity state. {}", setProductQuantityStateRequest);
-        return shoppingStoreService.setProductQuantityState(setProductQuantityStateRequest);
+    public Boolean setProductQuantityState(@RequestBody(required = false) SetProductQuantityStateRequest setProductQuantityStateRequest,
+                                           @RequestParam(required = false) UUID productId,
+                                           @RequestParam(required = false) QuantityState quantityState) {
+
+        SetProductQuantityStateRequest request;
+        request = Objects.requireNonNullElseGet(setProductQuantityStateRequest, () -> new SetProductQuantityStateRequest(productId, quantityState));
+        log.info("Set Product quantity state. {}", request);
+        return shoppingStoreService.setProductQuantityState(request);
     }
 
     @GetMapping("/{productId}")
