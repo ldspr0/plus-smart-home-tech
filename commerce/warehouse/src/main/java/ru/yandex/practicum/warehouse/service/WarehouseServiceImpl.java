@@ -125,9 +125,11 @@ public class WarehouseServiceImpl implements WarehouseService {
         } else {
             quantityState = QuantityState.MANY;
         }
-        log.info("productid:" + productId);
-        log.info("quantityState:" + quantityState);
+        log.info("productid: " + productId);
+        log.info("quantityState: " + quantityState);
         SetProductQuantityStateRequest request = new SetProductQuantityStateRequest(productId, quantityState);
+        log.info("request: " + request);
         shoppingStoreClient.setProductQuantityState(request);
+        log.info("ended updatepqishopstore");
     }
 }
