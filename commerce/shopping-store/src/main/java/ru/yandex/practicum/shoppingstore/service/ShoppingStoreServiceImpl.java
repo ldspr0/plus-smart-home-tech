@@ -1,6 +1,7 @@
 package ru.yandex.practicum.shoppingstore.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -21,6 +22,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -30,9 +32,20 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
 
     @Transactional(readOnly = true)
     public List<ProductDto> getProducts(ProductCategory productCategory, PageableDto pageableDto) {
-        Pageable pageRequest = PageRequest.of(pageableDto.getPage(), pageableDto.getSize(),
-                Sort.by(Sort.DEFAULT_DIRECTION, String.join(",", pageableDto.getSort())));
+        log.info("Service called - category: {}, page: {}, size: {}, sort: {}",
+                productCategory, pageableDto.getPage(), pageableDto.getSize(), pageableDto.getSort());
+
+        Sort sort;
+        if (pageableDto.getSort() == null || pageableDto.getSort().isEmpty()) {
+            sort = Sort.unsorted();
+        } else {
+            sort = Sort.by(Sort.DEFAULT_DIRECTION, String.join(",", pageableDto.getSort()));
+        }
+
+        Pageable pageRequest = PageRequest.of(pageableDto.getPage(), pageableDto.getSize(), sort);
+
         List<Product> products = shoppingStoreRepository.findAllByProductCategory(productCategory, pageRequest);
+
         if (CollectionUtils.isEmpty(products)) {
             return Collections.emptyList();
         } else {
