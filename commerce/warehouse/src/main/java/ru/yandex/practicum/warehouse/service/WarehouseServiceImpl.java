@@ -2,6 +2,7 @@ package ru.yandex.practicum.warehouse.service;
 
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +30,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(isolation = Isolation.READ_COMMITTED)
@@ -74,8 +76,12 @@ public class WarehouseServiceImpl implements WarehouseService {
         Warehouse warehouse = warehouseRepository.findById(addProductToWarehouseRequest.getProductId()).orElseThrow(
                 () -> new NoSpecifiedProductInWarehouseException("ProductId: " + addProductToWarehouseRequest.getProductId() + " is not found in Warehouse.")
         );
+        log.info("set quantity start");
         warehouse.setQuantity(warehouse.getQuantity() + addProductToWarehouseRequest.getQuantity());
+        log.info("set quantity end");
+        log.info("update product q start");
         updateProductQuantityInShoppingStore(warehouse);
+        log.info("update product q end");
     }
 
     @Override
@@ -119,6 +125,8 @@ public class WarehouseServiceImpl implements WarehouseService {
         } else {
             quantityState = QuantityState.MANY;
         }
+        log.info("productid:" + productId);
+        log.info("quantityState:" + quantityState);
         SetProductQuantityStateRequest request = new SetProductQuantityStateRequest(productId, quantityState);
         shoppingStoreClient.setProductQuantityState(request);
     }
