@@ -18,9 +18,6 @@ import ru.yandex.practicum.shoppingstore.mapper.ProductMapper;
 import ru.yandex.practicum.shoppingstore.model.Product;
 import ru.yandex.practicum.shoppingstore.repository.ShoppingStoreRepository;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -34,12 +31,11 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
     @Transactional(readOnly = true)
     public Page<ProductDto> getProducts(ProductCategory productCategory, PageableDto pageableDto) {
 
-        int page = (pageableDto != null && pageableDto.getPage() != null) ? pageableDto.getPage() : 0;
-        int size = (pageableDto != null && pageableDto.getSize() != null) ? pageableDto.getSize() : 20;
-        List<String> sortParams = (pageableDto != null) ? pageableDto.getSort() : Collections.emptyList();
-
-        Sort sort = createSortFromRequest(sortParams);
-        Pageable pageRequest = PageRequest.of(page, size, sort);
+        Sort sort = Sort.by(Sort.Direction.DESC, "productName");
+        if (pageableDto != null) {
+            sort = Sort.by(Sort.DEFAULT_DIRECTION, String.join(",", pageableDto.getSort()));
+        }
+        Pageable pageRequest = PageRequest.of(pageableDto.getPage(), pageableDto.getSize(), sort);
 
         Page<Product> productPage = shoppingStoreRepository.findAllByProductCategory(productCategory, pageRequest);
 
@@ -88,25 +84,5 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
                 () -> new ProductNotFoundException(String.format("Error, Product with id %s is not found", productId))
         );
         return productMapper.productToProductDto(product);
-    }
-
-    private Sort createSortFromRequest(List<String> sortParams) {
-        if (sortParams == null || sortParams.isEmpty()) {
-            return Sort.by(Sort.Direction.ASC, "productName"); // default
-        }
-
-        List<Sort.Order> orders = new ArrayList<>();
-        for (String sortParam : sortParams) {
-            if (sortParam.contains(",")) {
-                String[] parts = sortParam.split(",");
-                String field = parts[0].trim();
-                Sort.Direction direction = parts.length > 1 ?
-                        Sort.Direction.fromString(parts[1].trim()) : Sort.Direction.ASC;
-                orders.add(new Sort.Order(direction, field));
-            } else {
-                orders.add(new Sort.Order(Sort.Direction.ASC, sortParam.trim()));
-            }
-        }
-        return Sort.by(orders);
     }
 }
