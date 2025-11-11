@@ -36,23 +36,7 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
         log.info("Service called - category: {}, page: {}, size: {}, sort: {}",
                 productCategory, pageableDto.getPage(), pageableDto.getSize(), pageableDto.getSort());
 
-        Sort sort = Sort.unsorted();
-        if (pageableDto.getSort() != null && !pageableDto.getSort().isEmpty()) {
-            List<Sort.Order> orders = new ArrayList<>();
-            for (String sortParam : pageableDto.getSort()) {
-                if (sortParam.contains(",")) {
-                    String[] parts = sortParam.split(",");
-                    String field = parts[0].trim();
-                    Sort.Direction direction = parts.length > 1 ?
-                            Sort.Direction.fromString(parts[1].trim()) : Sort.Direction.ASC;
-                    orders.add(new Sort.Order(direction, field));
-                } else {
-                    orders.add(new Sort.Order(Sort.Direction.ASC, sortParam.trim()));
-                }
-            }
-            sort = Sort.by(orders);
-        }
-
+        Sort sort = Sort.by(Sort.Direction.ASC, "productName");
         Pageable pageRequest = PageRequest.of(pageableDto.getPage(), pageableDto.getSize(), sort);
 
         List<Product> products = shoppingStoreRepository.findAllByProductCategory(productCategory, pageRequest);
