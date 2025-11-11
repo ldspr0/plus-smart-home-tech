@@ -10,10 +10,12 @@ import ru.yandex.practicum.interactionapi.request.ChangeProductQuantityRequest;
 import ru.yandex.practicum.interactionapi.dto.ShoppingCartDto;
 import ru.yandex.practicum.shoppingcart.exception.NoProductsInShoppingCartException;
 import ru.yandex.practicum.shoppingcart.exception.NotAuthorizedUserException;
+import ru.yandex.practicum.shoppingcart.exception.ProductInShoppingCartIsNotInWarehouse;
 import ru.yandex.practicum.shoppingcart.mapper.ShoppingCartMapper;
 import ru.yandex.practicum.shoppingcart.model.ShoppingCart;
 import ru.yandex.practicum.shoppingcart.repository.ShoppingCartRepository;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -37,11 +39,21 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     @Override
     public ShoppingCartDto addProductToShoppingCart(String username, Map<UUID, Long> request) {
         checkUsername(username);
-        ShoppingCart shoppingCart = ShoppingCart.builder()
-                .username(username)
-                .products(request)
-                .active(true)
-                .build();
+        ShoppingCart shoppingCart = shoppingCartRepository.findByUsername(username);
+
+        if (shoppingCart == null) {
+            shoppingCart = ShoppingCart.builder()
+                    .username(username)
+                    .products(new HashMap<>())
+                    .active(true)
+                    .build();
+        }
+
+        for (Map.Entry<UUID, Long> entry : request.entrySet()) {
+            shoppingCart.getProducts().put(entry.getKey(),
+                    shoppingCart.getProducts().getOrDefault(entry.getKey(), 0L) + entry.getValue());
+        }
+
         return shoppingCartMapper.toShoppingCartDto(shoppingCartRepository.save(shoppingCart));
     }
 
@@ -49,17 +61,26 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     public void deactivateCurrentShoppingCart(String username) {
         checkUsername(username);
         ShoppingCart shoppingCart = shoppingCartRepository.findByUsername(username);
+        if (shoppingCart == null) {
+            throw new ProductInShoppingCartIsNotInWarehouse("Shopping cart not found for user: " + username);
+        }
         shoppingCart.setActive(false);
+        shoppingCartRepository.save(shoppingCart);
     }
 
     @Override
-    public ShoppingCartDto removeFromShoppingCart(String username, Map<UUID, Long> request) {
+    public ShoppingCartDto removeFromShoppingCart(String username, Map<UUID, Long> productsToRemove) {
         checkUsername(username);
         ShoppingCart shoppingCart = shoppingCartRepository.findByUsername(username);
-        if (shoppingCart == null) {
+        if (shoppingCart == null || shoppingCart.getProducts().isEmpty()) {
             throw new NoProductsInShoppingCartException("User " + username + " doesn't have products in a cart.");
         }
-        shoppingCart.setProducts(request);
+
+        for (UUID productId : productsToRemove.keySet()) {
+            shoppingCart.getProducts().remove(productId);
+        }
+
+        shoppingCartRepository.save(shoppingCart);
         return shoppingCartMapper.toShoppingCartDto(shoppingCart);
     }
 
@@ -67,11 +88,16 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     public ShoppingCartDto changeProductQuantity(String username, ChangeProductQuantityRequest requestDto) {
         checkUsername(username);
         ShoppingCart shoppingCart = shoppingCartRepository.findByUsername(username);
-        shoppingCart.getProducts().entrySet().stream()
-                .filter(entry -> entry.getKey().equals(requestDto.getProductId()))
-                .peek(entry -> entry.setValue(requestDto.getNewQuantity()))
-                .findAny()
-                .orElseThrow(() -> new NoProductsInShoppingCartException("User " + username + " doesn't have products in a cart."));
+        if (shoppingCart == null || shoppingCart.getProducts().isEmpty()) {
+            throw new NoProductsInShoppingCartException("User " + username + " doesn't have products in a cart.");
+        }
+
+        if (shoppingCart.getProducts().containsKey(requestDto.getProductId())) {
+            shoppingCart.getProducts().put(requestDto.getProductId(), requestDto.getNewQuantity());
+        } else {
+            throw new NoProductsInShoppingCartException("Product not found in cart: " + requestDto.getProductId());
+        }
+
         shoppingCartRepository.save(shoppingCart);
         return shoppingCartMapper.toShoppingCartDto(shoppingCart);
     }
