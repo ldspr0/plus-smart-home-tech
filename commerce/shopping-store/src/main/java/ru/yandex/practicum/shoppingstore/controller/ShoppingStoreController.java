@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.interactionapi.dto.PageableDto;
 import ru.yandex.practicum.interactionapi.enums.QuantityState;
@@ -12,7 +13,6 @@ import ru.yandex.practicum.interactionapi.dto.ProductDto;
 import ru.yandex.practicum.interactionapi.enums.ProductCategory;
 import ru.yandex.practicum.shoppingstore.service.ShoppingStoreService;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -25,7 +25,7 @@ public class ShoppingStoreController {
     private final ShoppingStoreService shoppingStoreService;
 
     @GetMapping
-    public List<ProductDto> getProducts(@RequestParam(name = "category") ProductCategory productCategory,
+    public Page<ProductDto> getProducts(@RequestParam(name = "category") ProductCategory productCategory,
                                         PageableDto pageableDto) {
         log.info("Get Products with pagination.");
         return shoppingStoreService.getProducts(productCategory, pageableDto);
