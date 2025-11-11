@@ -16,3 +16,8 @@ spring:
     url: jdbc:postgresql://localhost:8432/warehouse-db
     username: warehouse
     password: warehouse
+
+logging:
+  level:
+    ru.yandex.practicum.interactionapi.feign.ShoppingStoreClient: DEBUG
+    feign: DEBUG
