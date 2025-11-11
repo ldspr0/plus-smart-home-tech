@@ -12,6 +12,7 @@ import ru.yandex.practicum.interactionapi.enums.QuantityState;
 import ru.yandex.practicum.interactionapi.feign.ShoppingStoreClient;
 import ru.yandex.practicum.interactionapi.request.AddProductToWarehouseRequest;
 import ru.yandex.practicum.interactionapi.request.NewProductInWarehouseRequest;
+import ru.yandex.practicum.interactionapi.request.SetProductQuantityStateRequest;
 import ru.yandex.practicum.warehouse.model.Address;
 import ru.yandex.practicum.warehouse.exception.NoSpecifiedProductInWarehouseException;
 import ru.yandex.practicum.warehouse.exception.ProductInShoppingCartLowQuantityInWarehouseException;
@@ -118,6 +119,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         } else {
             quantityState = QuantityState.MANY;
         }
-        shoppingStoreClient.setProductQuantityState(productId, quantityState);
+        SetProductQuantityStateRequest request = new SetProductQuantityStateRequest(productId, quantityState);
+        shoppingStoreClient.setProductQuantityState(request);
     }
 }
