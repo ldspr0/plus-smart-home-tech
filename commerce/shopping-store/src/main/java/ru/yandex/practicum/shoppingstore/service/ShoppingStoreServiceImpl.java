@@ -32,9 +32,6 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
     public Page<ProductDto> getProducts(ProductCategory productCategory, PageableDto pageableDto) {
 
         Sort sort = Sort.by(Sort.Direction.DESC, "productName");
-        if (pageableDto != null) {
-            sort = Sort.by(Sort.DEFAULT_DIRECTION, String.join(",", pageableDto.getSort()));
-        }
         Pageable pageRequest = PageRequest.of(pageableDto.getPage(), pageableDto.getSize(), sort);
 
         Page<Product> productPage = shoppingStoreRepository.findAllByProductCategory(productCategory, pageRequest);
