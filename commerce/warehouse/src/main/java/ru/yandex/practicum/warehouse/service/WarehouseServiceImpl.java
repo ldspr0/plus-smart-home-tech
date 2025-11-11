@@ -113,9 +113,9 @@ public class WarehouseServiceImpl implements WarehouseService {
         if (quantity == 0) {
             quantityState = QuantityState.ENDED;
         } else if (quantity < 10) {
-            quantityState = QuantityState.ENOUGH;
-        } else if (quantity < 100) {
             quantityState = QuantityState.FEW;
+        } else if (quantity < 100) {
+            quantityState = QuantityState.ENOUGH;
         } else {
             quantityState = QuantityState.MANY;
         }
