@@ -1,8 +1,11 @@
+server:
+  port: 0
+
 spring:
-  config:
-    import: "configserver:"
   application:
     name: shopping-cart
+  config:
+    import: "configserver:"
   cloud:
     config:
       fail-fast: true
@@ -10,5 +13,17 @@ spring:
         enabled: true
         service-id: config-server
       retry:
-        useRandomPolicy: true
+        use-random-policy: true
         max-interval: 6000
+
+eureka:
+  instance:
+    preferIpAddress: true
+    hostname: localhost
+    instance-id: "${spring.application.name}:${random.value}"
+    leaseRenewalIntervalInSeconds: 10
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    healthcheck:
+      enabled: true

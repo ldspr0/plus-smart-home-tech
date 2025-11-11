@@ -1,21 +1,4 @@
-server:
-  port: 0
-
 spring:
-  application:
-    name: shopping-cart
-  cloud:
-    openfeign:
-      circuitbreaker:
-        enabled: true
-        alphanumeric-ids:
-          enabled: true
-      lazy-attributes: true
-      client:
-        config:
-          default:
-            connectTimeout: 10000
-            readTimeout: 10000
   jpa:
     hibernate:
       ddl-auto: none
@@ -23,43 +6,34 @@ spring:
       hibernate:
         format_sql: true
     show_sql: true
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true
+        alphanumeric-ids:
+          enabled: true
+
   sql:
     init:
       mode: always
+
   datasource:
     driverClassName: org.postgresql.Driver
     url: jdbc:postgresql://localhost:7432/cart-db
     username: cart
     password: cart
 
-feign:
-  client:
-    config:
-      default:
-        connectTimeout: 10000
-        readTimeout: 10000
-        loggerLevel: basic
-
-eureka:
-  instance:
-    instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}}
-    lease-renewal-interval-in-seconds: 3
-    lease-expiration-duration-in-seconds: 6
-  client:
-    healthcheck:
-      enabled: true
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
-    initial-instance-info-replication-interval-seconds: 3
-    registry-fetch-interval-seconds: 3
-
 resilience4j:
   circuitbreaker:
     instances:
       warehouse:
-        registerHealthIndicator: true
         slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10000
+        permittedNumberOfCallsInHalfOpenState: 3
+        slidingWindowType: COUNT_BASED
         minimumNumberOfCalls: 5
+        automaticTransitionFromOpenToHalfOpenEnabled: true
 
 management:
   endpoints:

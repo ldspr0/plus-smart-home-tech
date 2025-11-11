@@ -25,5 +25,5 @@ create table if not exists booking_products
     shopping_cart_id uuid references bookings (shopping_cart_id) on delete cascade,
     product_id       uuid not null,
     quantity         integer,
-    primary key (shopping_cart_id, product_id)  -- Правильный составной ключ
+    primary key (shopping_cart_id, product_id)
 );
