@@ -2,12 +2,12 @@ package ru.yandex.practicum.shoppingstore.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 import ru.yandex.practicum.interactionapi.request.SetProductQuantityStateRequest;
 import ru.yandex.practicum.interactionapi.dto.PageableDto;
 import ru.yandex.practicum.interactionapi.dto.ProductDto;
@@ -18,9 +18,6 @@ import ru.yandex.practicum.shoppingstore.mapper.ProductMapper;
 import ru.yandex.practicum.shoppingstore.model.Product;
 import ru.yandex.practicum.shoppingstore.repository.ShoppingStoreRepository;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -32,20 +29,14 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
     private final ProductMapper productMapper;
 
     @Transactional(readOnly = true)
-    public List<ProductDto> getProducts(ProductCategory productCategory, PageableDto pageableDto) {
-        log.info("Service called - category: {}, page: {}, size: {}, sort: {}",
-                productCategory, pageableDto.getPage(), pageableDto.getSize(), pageableDto.getSort());
+    public Page<ProductDto> getProducts(ProductCategory productCategory, PageableDto pageableDto) {
 
         Sort sort = Sort.by(Sort.Direction.ASC, "productName");
         Pageable pageRequest = PageRequest.of(pageableDto.getPage(), pageableDto.getSize(), sort);
 
-        List<Product> products = shoppingStoreRepository.findAllByProductCategory(productCategory, pageRequest);
+        Page<Product> productPage = shoppingStoreRepository.findAllByProductCategory(productCategory, pageRequest);
 
-        if (CollectionUtils.isEmpty(products)) {
-            return Collections.emptyList();
-        } else {
-            return productMapper.productsToProductsDto(products);
-        }
+        return productPage.map(productMapper::productToProductDto);
     }
 
     @Override
