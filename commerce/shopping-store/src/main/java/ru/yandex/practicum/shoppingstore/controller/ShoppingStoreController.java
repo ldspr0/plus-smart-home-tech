@@ -23,7 +23,7 @@ public class ShoppingStoreController {
     private final ShoppingStoreService shoppingStoreService;
 
     @GetMapping
-    public List<ProductDto> getProducts(@RequestParam ProductCategory productCategory,
+    public List<ProductDto> getProducts(@RequestParam(name = "category") ProductCategory productCategory,
                                         @Valid PageableDto pageableDto) {
         log.info("Get Products with pagination.");
         return shoppingStoreService.getProducts(productCategory, pageableDto);
