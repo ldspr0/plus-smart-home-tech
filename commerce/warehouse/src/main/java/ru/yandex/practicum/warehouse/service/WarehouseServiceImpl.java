@@ -76,12 +76,8 @@ public class WarehouseServiceImpl implements WarehouseService {
         Warehouse warehouse = warehouseRepository.findById(addProductToWarehouseRequest.getProductId()).orElseThrow(
                 () -> new NoSpecifiedProductInWarehouseException("ProductId: " + addProductToWarehouseRequest.getProductId() + " is not found in Warehouse.")
         );
-        log.info("set quantity start");
         warehouse.setQuantity(warehouse.getQuantity() + addProductToWarehouseRequest.getQuantity());
-        log.info("set quantity end");
-        log.info("update product q start");
-        updateProductQuantityInShoppingStore(warehouse);
-        log.info("update product q end");
+        warehouseRepository.save(warehouse);
     }
 
     @Override
@@ -111,7 +107,7 @@ public class WarehouseServiceImpl implements WarehouseService {
                 .build();
     }
 
-    private void updateProductQuantityInShoppingStore(Warehouse product) {
+    private void updateProductQuantityInWarehouse(Warehouse product) {
         UUID productId = product.getProductId();
         QuantityState quantityState;
         Long quantity = product.getQuantity();
