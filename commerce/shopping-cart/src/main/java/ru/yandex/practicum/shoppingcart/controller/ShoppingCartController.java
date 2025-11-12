@@ -9,6 +9,7 @@ import ru.yandex.practicum.interactionapi.request.ChangeProductQuantityRequest;
 import ru.yandex.practicum.interactionapi.dto.ShoppingCartDto;
 import ru.yandex.practicum.shoppingcart.service.ShoppingCartService;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -40,8 +41,8 @@ public class ShoppingCartController {
 
     @PostMapping("/remove")
     public ShoppingCartDto removeFromShoppingCart(@RequestParam String username,
-                                                  @RequestBody Map<UUID, Long> request) {
-        log.info("Remove item from a cart. {}", username);
+                                                  @RequestBody List<UUID> request) {
+        log.info("Remove items from a cart. {}", username);
         return shoppingCartService.removeFromShoppingCart(username, request);
     }
 

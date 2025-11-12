@@ -16,6 +16,7 @@ import ru.yandex.practicum.shoppingcart.model.ShoppingCart;
 import ru.yandex.practicum.shoppingcart.repository.ShoppingCartRepository;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -69,14 +70,14 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     }
 
     @Override
-    public ShoppingCartDto removeFromShoppingCart(String username, Map<UUID, Long> productsToRemove) {
+    public ShoppingCartDto removeFromShoppingCart(String username, List<UUID> productsToRemove) {
         checkUsername(username);
         ShoppingCart shoppingCart = shoppingCartRepository.findByUsername(username);
         if (shoppingCart == null || shoppingCart.getProducts().isEmpty()) {
             throw new NoProductsInShoppingCartException("User " + username + " doesn't have products in a cart.");
         }
 
-        for (UUID productId : productsToRemove.keySet()) {
+        for (UUID productId : productsToRemove) {
             shoppingCart.getProducts().remove(productId);
         }
 
