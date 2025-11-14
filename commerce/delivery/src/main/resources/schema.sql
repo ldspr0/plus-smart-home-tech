@@ -1,21 +1,30 @@
-create table if not exists orders
+create table if not exists address
 (
-    order_id         uuid default gen_random_uuid() primary key,
-    shopping_cart_id uuid not null,
-    payment_id       uuid,
-    delivery_id      uuid,
-    state            varchar(50),
-    delivery_weight  double precision,
-    delivery_volume  double precision,
-    fragile          boolean,
-    total_price      double precision,
-    delivery_price   double precision,
-    product_price    double precision
+    address_id uuid default gen_random_uuid() primary key,
+    country    varchar,
+    city       varchar,
+    street     varchar,
+    house      varchar,
+    flat       varchar
 );
 
-create table if not exists order_items
+create table if not exists deliveries
 (
-    order_id   uuid references orders (order_id) on delete cascade,
-    product_id uuid not null,
-    quantity   integer
+    delivery_id    uuid default gen_random_uuid() primary key,
+    from_address   uuid,
+    to_address     uuid,
+    order_id       uuid,
+    delivery_state varchar(50)
+);
+
+create table if not exists from_address
+(
+    delivery_id uuid references deliveries (delivery_id),
+    address_id  uuid references address (address_id)
+);
+
+create table if not exists to_address
+(
+    delivery_id uuid references deliveries (delivery_id),
+    address_id  uuid references address (address_id)
 );
