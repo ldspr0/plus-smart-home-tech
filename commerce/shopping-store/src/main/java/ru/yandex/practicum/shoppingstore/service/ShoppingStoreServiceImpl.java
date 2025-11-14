@@ -1,7 +1,6 @@
 package ru.yandex.practicum.shoppingstore.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,10 +19,8 @@ import ru.yandex.practicum.shoppingstore.repository.ShoppingStoreRepository;
 
 import java.util.UUID;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class ShoppingStoreServiceImpl implements ShoppingStoreService {
     private final ShoppingStoreRepository shoppingStoreRepository;
     private final ProductMapper productMapper;
@@ -40,32 +37,31 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
     }
 
     @Override
+    @Transactional
     public ProductDto createNewProduct(ProductDto productDto) {
         Product newProduct = productMapper.productDtoToProduct(productDto);
         return productMapper.productToProductDto(shoppingStoreRepository.save(newProduct));
     }
 
     @Override
+    @Transactional
     public ProductDto updateProduct(ProductDto productDto) {
-        Product oldProduct = shoppingStoreRepository.findByProductId(productDto.getProductId())
-                .orElseThrow(() -> new ProductNotFoundException(
-                        String.format("Error, Product with id %s is not found", productDto.getProductId()))
-                );
+        Product oldProduct = checkProductById(productDto.getProductId());
         Product newProduct = productMapper.productDtoToProduct(productDto);
         newProduct.setProductId(oldProduct.getProductId());
         return productMapper.productToProductDto(shoppingStoreRepository.save(newProduct));
     }
 
     @Override
+    @Transactional
     public boolean removeProductFromStore(UUID productId) {
-        Product product = shoppingStoreRepository.findByProductId(productId).orElseThrow(
-                () -> new ProductNotFoundException(String.format("Error, Product with id %s is not found", productId))
-        );
+        Product product = checkProductById(productId);
         product.setProductState(ProductState.DEACTIVATE);
         return true;
     }
 
     @Override
+    @Transactional
     public boolean setProductQuantityState(SetProductQuantityStateRequest setProductQuantityStateRequest) {
         Product product = shoppingStoreRepository.findByProductId(setProductQuantityStateRequest.getProductId())
                 .orElseThrow(
@@ -76,10 +72,15 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ProductDto getProduct(UUID productId) {
-        Product product = shoppingStoreRepository.findByProductId(productId).orElseThrow(
+        Product product = checkProductById(productId);
+        return productMapper.productToProductDto(product);
+    }
+
+    private Product checkProductById(UUID productId) {
+        return shoppingStoreRepository.findByProductId(productId).orElseThrow(
                 () -> new ProductNotFoundException(String.format("Error, Product with id %s is not found", productId))
         );
-        return productMapper.productToProductDto(product);
     }
 }

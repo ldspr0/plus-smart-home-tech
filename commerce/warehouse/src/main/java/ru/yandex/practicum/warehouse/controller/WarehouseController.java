@@ -3,6 +3,7 @@ package ru.yandex.practicum.warehouse.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.interactionapi.dto.AddressDto;
 import ru.yandex.practicum.interactionapi.dto.BookedProductsDto;
@@ -19,24 +20,28 @@ public class WarehouseController {
     private final WarehouseService warehouseService;
 
     @PutMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public void newProductInWarehouse(@RequestBody @Valid NewProductInWarehouseRequest requestDto) {
         log.info("Add new Product in Warehouse. {}", requestDto);
         warehouseService.newProductInWarehouse(requestDto);
     }
 
     @PostMapping("/check")
+    @ResponseStatus(HttpStatus.OK)
     public BookedProductsDto checkProductQuantityEnoughForShoppingCart(@RequestBody @Valid ShoppingCartDto shoppingCartDto) {
         log.info("Check quantity of Products for a cart. {}", shoppingCartDto);
         return warehouseService.checkProductQuantityEnoughForShoppingCart(shoppingCartDto);
     }
 
     @PostMapping("/add")
+    @ResponseStatus(HttpStatus.CREATED)
     public void addProductToWarehouse(@RequestBody @Valid AddProductToWarehouseRequest requestDto) {
         log.info("Add Product to Warehouse. {}", requestDto);
         warehouseService.addProductToWarehouse(requestDto);
     }
 
     @GetMapping("/address")
+    @ResponseStatus(HttpStatus.OK)
     public AddressDto getAddress() {
         log.info("Get address.");
         return warehouseService.getAddress();

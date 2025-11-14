@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional(isolation = Isolation.READ_COMMITTED)
 public class WarehouseServiceImpl implements WarehouseService {
 
     private final WarehouseRepository warehouseRepository;
@@ -41,6 +40,7 @@ public class WarehouseServiceImpl implements WarehouseService {
     private final ShoppingStoreClient shoppingStoreClient;
 
     @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void newProductInWarehouse(NewProductInWarehouseRequest newProductInWarehouseRequest) {
         warehouseRepository.findById(newProductInWarehouseRequest.getProductId()).ifPresent(warehouse -> {
             throw new SpecifiedProductAlreadyInWarehouseException("Error, specified product is already exists.");
@@ -49,6 +49,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         warehouseRepository.save(warehouse);
     }
 
+    @Override
     public BookedProductsDto checkProductQuantityEnoughForShoppingCart(ShoppingCartDto shoppingCartDto) {
         Map<UUID, Long> products = shoppingCartDto.getProducts();
         Set<UUID> cartProductIds = products.keySet();
@@ -72,6 +73,7 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void addProductToWarehouse(AddProductToWarehouseRequest addProductToWarehouseRequest) {
         Warehouse warehouse = warehouseRepository.findById(addProductToWarehouseRequest.getProductId()).orElseThrow(
                 () -> new NoSpecifiedProductInWarehouseException("ProductId: " + addProductToWarehouseRequest.getProductId() + " is not found in Warehouse.")
@@ -107,25 +109,4 @@ public class WarehouseServiceImpl implements WarehouseService {
                 .build();
     }
 
-    private void updateProductQuantityInWarehouse(Warehouse product) {
-        UUID productId = product.getProductId();
-        QuantityState quantityState;
-        Long quantity = product.getQuantity();
-
-        if (quantity == 0) {
-            quantityState = QuantityState.ENDED;
-        } else if (quantity < 10) {
-            quantityState = QuantityState.FEW;
-        } else if (quantity < 100) {
-            quantityState = QuantityState.ENOUGH;
-        } else {
-            quantityState = QuantityState.MANY;
-        }
-        log.info("productid: " + productId);
-        log.info("quantityState: " + quantityState);
-        SetProductQuantityStateRequest request = new SetProductQuantityStateRequest(productId, quantityState);
-        log.info("request: " + request);
-        shoppingStoreClient.setProductQuantityState(request);
-        log.info("ended updatepqishopstore");
-    }
 }

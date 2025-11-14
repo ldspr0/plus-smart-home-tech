@@ -66,7 +66,6 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
             throw new ProductInShoppingCartIsNotInWarehouse("Shopping cart not found for user: " + username);
         }
         shoppingCart.setActive(false);
-        shoppingCartRepository.save(shoppingCart);
     }
 
     @Override
@@ -81,7 +80,6 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
             shoppingCart.getProducts().remove(productId);
         }
 
-        shoppingCartRepository.save(shoppingCart);
         return shoppingCartMapper.toShoppingCartDto(shoppingCart);
     }
 
@@ -99,7 +97,6 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
             throw new NoProductsInShoppingCartException("Product not found in cart: " + requestDto.getProductId());
         }
 
-        shoppingCartRepository.save(shoppingCart);
         return shoppingCartMapper.toShoppingCartDto(shoppingCart);
     }
 
@@ -111,7 +108,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     }
 
     private void checkUsername(String username) {
-        if (username == null || username.isEmpty()) {
+        if (username == null || username.trim().isEmpty()) {
             throw new NotAuthorizedUserException("Username shouldn't be empty.");
         }
     }
