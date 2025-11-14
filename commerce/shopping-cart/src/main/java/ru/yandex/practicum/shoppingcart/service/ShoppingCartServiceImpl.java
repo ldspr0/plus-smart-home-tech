@@ -108,7 +108,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     }
 
     private void checkUsername(String username) {
-        if (username == null || username.trim().isEmpty()) {
+        if (username == null || username.isBlank()) {
             throw new NotAuthorizedUserException("Username shouldn't be empty.");
         }
     }

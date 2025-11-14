@@ -60,7 +60,8 @@ public class ShoppingStoreController {
                                            @RequestParam(required = false) UUID productId,
                                            @RequestParam(required = false) QuantityState quantityState) {
 
-        SetProductQuantityStateRequest request = Objects.requireNonNullElseGet(setProductQuantityStateRequest, () -> new SetProductQuantityStateRequest(productId, quantityState));
+        SetProductQuantityStateRequest request = Objects.requireNonNullElseGet(setProductQuantityStateRequest,
+                () -> new SetProductQuantityStateRequest(productId, quantityState));
         log.info("Set Product quantity state. {}", request);
         return shoppingStoreService.setProductQuantityState(request);
     }

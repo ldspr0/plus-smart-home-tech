@@ -49,7 +49,7 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
         Product oldProduct = checkProductById(productDto.getProductId());
         Product newProduct = productMapper.productDtoToProduct(productDto);
         newProduct.setProductId(oldProduct.getProductId());
-        return productMapper.productToProductDto(shoppingStoreRepository.save(newProduct));
+        return productMapper.productToProductDto(newProduct);
     }
 
     @Override

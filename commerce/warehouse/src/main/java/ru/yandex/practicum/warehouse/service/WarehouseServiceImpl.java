@@ -79,7 +79,6 @@ public class WarehouseServiceImpl implements WarehouseService {
                 () -> new NoSpecifiedProductInWarehouseException("ProductId: " + addProductToWarehouseRequest.getProductId() + " is not found in Warehouse.")
         );
         warehouse.setQuantity(warehouse.getQuantity() + addProductToWarehouseRequest.getQuantity());
-        warehouseRepository.save(warehouse);
     }
 
     @Override
