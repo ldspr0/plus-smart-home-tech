@@ -18,6 +18,7 @@ public interface ShoppingCartClient {
     @PutMapping
     ShoppingCartDto addProductToShoppingCart(@RequestParam String username,
                                              @RequestBody Map<UUID, Long> request);
+
     @DeleteMapping
     void deactivateCurrentShoppingCart(@RequestParam String username);
 
@@ -26,5 +27,6 @@ public interface ShoppingCartClient {
                                            @RequestBody Map<UUID, Long> request);
 
     @PostMapping("/change-quantity")
-    ShoppingCartDto changeProductQuantity(@RequestParam String username, @RequestBody @Valid ChangeProductQuantityRequest requestDto);
+    ShoppingCartDto changeProductQuantity(@RequestParam String username,
+                                          @RequestBody @Valid ChangeProductQuantityRequest requestDto);
 }
