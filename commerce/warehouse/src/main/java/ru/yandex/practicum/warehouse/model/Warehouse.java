@@ -4,6 +4,8 @@ import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.*;
 
 import java.util.UUID;
@@ -22,5 +24,5 @@ public class Warehouse {
     private Boolean fragile;
     @Embedded
     private Dimension dimension;
-    double weight;
+    private double weight;
 }

@@ -10,7 +10,7 @@ import ru.yandex.practicum.interactionapi.dto.ShoppingCartDto;
 import ru.yandex.practicum.interactionapi.request.AddProductToWarehouseRequest;
 import ru.yandex.practicum.interactionapi.request.NewProductInWarehouseRequest;
 
-@FeignClient(name = "warehouse", path = "/api/v1/warehouse", fallback = WarehouseClientFallback.class)
+@FeignClient(name = "warehouse", path = "/api/v1/warehouse")
 public interface WarehouseClient {
 
     @PutMapping

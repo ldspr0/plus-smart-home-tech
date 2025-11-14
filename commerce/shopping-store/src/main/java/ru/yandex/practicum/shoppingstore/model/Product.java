@@ -1,6 +1,7 @@
 package ru.yandex.practicum.shoppingstore.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import ru.yandex.practicum.interactionapi.enums.ProductCategory;
 import ru.yandex.practicum.interactionapi.enums.ProductState;
@@ -19,7 +20,9 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID productId;
+    @NotBlank
     private String productName;
+    @NotBlank
     private String description;
     private String imageSrc;
     @Enumerated(EnumType.STRING)

@@ -16,3 +16,9 @@ spring:
     url: jdbc:postgresql://localhost:6432/store-db
     username: shopstore
     password: shopstore
+
+logging:
+  level:
+    ru.yandex.practicum.shoppingstore.controller: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.http: DEBUG

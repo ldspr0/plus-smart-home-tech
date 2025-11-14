@@ -2,6 +2,7 @@ package ru.yandex.practicum.warehouse.service;
 
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +13,7 @@ import ru.yandex.practicum.interactionapi.enums.QuantityState;
 import ru.yandex.practicum.interactionapi.feign.ShoppingStoreClient;
 import ru.yandex.practicum.interactionapi.request.AddProductToWarehouseRequest;
 import ru.yandex.practicum.interactionapi.request.NewProductInWarehouseRequest;
+import ru.yandex.practicum.interactionapi.request.SetProductQuantityStateRequest;
 import ru.yandex.practicum.warehouse.model.Address;
 import ru.yandex.practicum.warehouse.exception.NoSpecifiedProductInWarehouseException;
 import ru.yandex.practicum.warehouse.exception.ProductInShoppingCartLowQuantityInWarehouseException;
@@ -28,9 +30,9 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional(isolation = Isolation.READ_COMMITTED)
 public class WarehouseServiceImpl implements WarehouseService {
 
     private final WarehouseRepository warehouseRepository;
@@ -38,6 +40,7 @@ public class WarehouseServiceImpl implements WarehouseService {
     private final ShoppingStoreClient shoppingStoreClient;
 
     @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void newProductInWarehouse(NewProductInWarehouseRequest newProductInWarehouseRequest) {
         warehouseRepository.findById(newProductInWarehouseRequest.getProductId()).ifPresent(warehouse -> {
             throw new SpecifiedProductAlreadyInWarehouseException("Error, specified product is already exists.");
@@ -46,6 +49,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         warehouseRepository.save(warehouse);
     }
 
+    @Override
     public BookedProductsDto checkProductQuantityEnoughForShoppingCart(ShoppingCartDto shoppingCartDto) {
         Map<UUID, Long> products = shoppingCartDto.getProducts();
         Set<UUID> cartProductIds = products.keySet();
@@ -69,12 +73,12 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Override
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void addProductToWarehouse(AddProductToWarehouseRequest addProductToWarehouseRequest) {
         Warehouse warehouse = warehouseRepository.findById(addProductToWarehouseRequest.getProductId()).orElseThrow(
                 () -> new NoSpecifiedProductInWarehouseException("ProductId: " + addProductToWarehouseRequest.getProductId() + " is not found in Warehouse.")
         );
         warehouse.setQuantity(warehouse.getQuantity() + addProductToWarehouseRequest.getQuantity());
-        updateProductQuantityInShoppingStore(warehouse);
     }
 
     @Override
@@ -104,20 +108,4 @@ public class WarehouseServiceImpl implements WarehouseService {
                 .build();
     }
 
-    private void updateProductQuantityInShoppingStore(Warehouse product) {
-        UUID productId = product.getProductId();
-        QuantityState quantityState;
-        Long quantity = product.getQuantity();
-
-        if (quantity == 0) {
-            quantityState = QuantityState.ENDED;
-        } else if (quantity < 10) {
-            quantityState = QuantityState.ENOUGH;
-        } else if (quantity < 100) {
-            quantityState = QuantityState.FEW;
-        } else {
-            quantityState = QuantityState.MANY;
-        }
-        shoppingStoreClient.setProductQuantityState(productId, quantityState);
-    }
 }

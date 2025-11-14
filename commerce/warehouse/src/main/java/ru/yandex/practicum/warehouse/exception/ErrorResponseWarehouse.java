@@ -35,7 +35,7 @@ public class ErrorResponseWarehouse {
             ProductInShoppingCartLowQuantityInWarehouseException.class,
             SpecifiedProductAlreadyInWarehouseException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleBadRequestException(RuntimeException e) {
+    public ErrorResponse handleBadRequestException(Exception e) {
         log.error("400 {}", e.getMessage());
         return ErrorResponse.builder()
                 .cause(e.getCause())
