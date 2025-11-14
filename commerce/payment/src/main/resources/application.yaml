@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: order
+    name: payment
   config:
     import: "configserver:"
   cloud:

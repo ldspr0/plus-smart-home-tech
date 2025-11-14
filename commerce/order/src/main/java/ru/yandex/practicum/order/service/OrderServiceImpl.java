@@ -40,13 +40,13 @@ public class OrderServiceImpl implements OrderService {
     private final PaymentClient paymentClient;
     private final DeliveryClient deliveryClient;
 
-    private final String MESSAGE_ORDER_NOT_FOUND = "Заказ не найден.";
+    private final String MESSAGE_ORDER_NOT_FOUND = "Order is not found.";
 
     @Override
     @Transactional(readOnly = true)
     public List<OrderDto> getClientOrders(String username, Integer page, Integer size) {
         if (StringUtils.isEmpty(username))
-            throw new NotAuthorizedUserException("Имя пользователя не должно быть пустым.");
+            throw new NotAuthorizedUserException("Username should not be empty.");
         ShoppingCartDto shoppingCart = shoppingCartClient.getShoppingCart(username);
 
         Sort sortByCreated = Sort.by(Sort.Direction.DESC, "created");
