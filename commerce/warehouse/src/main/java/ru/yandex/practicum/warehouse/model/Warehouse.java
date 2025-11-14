@@ -19,9 +19,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class Warehouse {
     @Id
-    @NotNull
     private UUID productId;
-    @Positive
     private Long quantity;
     private Boolean fragile;
     @Embedded
