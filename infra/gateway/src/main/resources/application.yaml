@@ -1,16 +1,21 @@
+server:
+  port: 8080
+
 spring:
   application:
-    name: config-server
-  profiles:
-    active: native
+    name: gateway
+  config:
+    import: "configserver:"
   cloud:
     config:
-      server:
-        native:
-          searchLocations:
-            - classpath:config/telemetry/{application}
-            - classpath:config/commerce/{application}
-            - classpath:config/infra/{application}
+      fail-fast: true
+      retry:
+        useRandomPolicy: true
+        max-interval: 6000
+      discovery:
+        enabled: true
+        serviceId: config-server
+
 eureka:
   client:
     serviceUrl:
