@@ -15,6 +15,7 @@ import ru.yandex.practicum.payment.mapper.PaymentMapper;
 import ru.yandex.practicum.payment.model.Payment;
 import ru.yandex.practicum.payment.repository.PaymentRepository;
 
+import java.math.BigDecimal;
 import java.util.Map;
 import java.util.UUID;
 
@@ -36,10 +37,10 @@ public class PaymentServiceImpl implements PaymentService {
         checkOrder(orderDto);
         Payment payment = Payment.builder()
                 .orderId(orderDto.getOrderId())
-                .totalPayment(orderDto.getTotalPrice())
-                .deliveryTotal(orderDto.getDeliveryPrice())
-                .productsTotal(orderDto.getProductPrice())
-                .feeTotal(getTax(orderDto.getTotalPrice()))
+                .totalPayment(convertToBigDecimal(orderDto.getTotalPrice()))
+                .deliveryTotal(convertToBigDecimal(orderDto.getDeliveryPrice()))
+                .productsTotal(convertToBigDecimal(orderDto.getProductPrice()))
+                .feeTotal(getTax(convertToBigDecimal(orderDto.getTotalPrice())))
                 .status(PaymentState.PENDING)
                 .build();
         return paymentMapper.toPaymentDto(paymentRepository.save(payment));
@@ -47,11 +48,16 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @Transactional(readOnly = true)
-    public Double getTotalCost(OrderDto orderDto) {
+    public BigDecimal getTotalCost(OrderDto orderDto) {
         if (orderDto.getDeliveryPrice() == null) {
             throw new NotEnoughInfoInOrderToCalculateException(MESSAGE_NOT_INFORMATION);
         }
-        return orderDto.getProductPrice() + getTax(orderDto.getProductPrice()) + orderDto.getDeliveryPrice();
+
+        BigDecimal productPrice = convertToBigDecimal(orderDto.getProductPrice());
+        BigDecimal deliveryPrice = convertToBigDecimal(orderDto.getDeliveryPrice());
+        BigDecimal tax = getTax(productPrice);
+
+        return productPrice.add(tax).add(deliveryPrice);
     }
 
     @Override
@@ -64,17 +70,24 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @Transactional(readOnly = true)
-    public Double productCost(OrderDto orderDto) {
-        double productCost = 0.0;
+    public BigDecimal productCost(OrderDto orderDto) {
         Map<UUID, Long> products = orderDto.getProducts();
         if (products == null) {
             throw new NotEnoughInfoInOrderToCalculateException(MESSAGE_NOT_INFORMATION);
         }
+
+        BigDecimal totalCost = BigDecimal.ZERO;
+
         for (Map.Entry<UUID, Long> entry : products.entrySet()) {
             ProductDto product = shoppingStoreClient.getProduct(entry.getKey());
-            productCost += product.getPrice() * entry.getValue();
+            BigDecimal productPrice = convertToBigDecimal(product.getPrice());
+            BigDecimal quantity = BigDecimal.valueOf(entry.getValue());
+
+            BigDecimal productTotal = productPrice.multiply(quantity);
+            totalCost = totalCost.add(productTotal);
         }
-        return productCost;
+
+        return totalCost;
     }
 
     @Override
@@ -97,7 +110,15 @@ public class PaymentServiceImpl implements PaymentService {
         }
     }
 
-    private double getTax(double totalPrice) {
-        return totalPrice * 0.1;
+    private BigDecimal getTax(BigDecimal totalPrice) {
+        if (totalPrice == null) {
+            return BigDecimal.ZERO;
+        }
+        BigDecimal taxRate = new BigDecimal("0.10"); // 10%
+        return totalPrice.multiply(taxRate);
+    }
+
+    private BigDecimal convertToBigDecimal(Double value) {
+        return value != null ? BigDecimal.valueOf(value) : BigDecimal.ZERO;
     }
 }

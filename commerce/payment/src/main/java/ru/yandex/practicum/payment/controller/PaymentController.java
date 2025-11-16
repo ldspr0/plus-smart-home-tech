@@ -12,6 +12,7 @@ import ru.yandex.practicum.interactionapi.dto.PaymentDto;
 import ru.yandex.practicum.interactionapi.interfaces.PaymentOperations;
 import ru.yandex.practicum.payment.service.PaymentService;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Slf4j
@@ -36,7 +37,7 @@ public class PaymentController implements PaymentOperations {
 
     @Override
     @PostMapping("/totalCost")
-    public Double getTotalCost(@RequestBody @Valid OrderDto orderDto) {
+    public BigDecimal getTotalCost(@RequestBody @Valid OrderDto orderDto) {
         try {
             log.info("Get total cost: {}", orderDto);
             return paymentService.getTotalCost(orderDto);
@@ -60,7 +61,7 @@ public class PaymentController implements PaymentOperations {
 
     @Override
     @PostMapping("/productCost")
-    public Double productCost(@RequestBody @Valid OrderDto orderDto) {
+    public BigDecimal productCost(@RequestBody @Valid OrderDto orderDto) {
         try {
             log.info("Product Cost calc: {}", orderDto);
             return paymentService.productCost(orderDto);
