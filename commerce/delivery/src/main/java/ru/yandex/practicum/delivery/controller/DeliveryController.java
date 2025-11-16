@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.delivery.service.DeliveryService;
 import ru.yandex.practicum.interactionapi.dto.DeliveryDto;
 import ru.yandex.practicum.interactionapi.dto.OrderDto;
+import ru.yandex.practicum.interactionapi.interfaces.DeliveryOperations;
 
 import java.util.UUID;
 
@@ -14,10 +15,12 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/delivery")
 @RequiredArgsConstructor
-public class DeliveryController {
+public class DeliveryController implements DeliveryOperations {
 
     private final DeliveryService deliveryService;
 
+
+    @Override
     @PutMapping
     public DeliveryDto planDelivery(@RequestBody @Valid DeliveryDto deliveryDto) {
         try {
@@ -29,6 +32,7 @@ public class DeliveryController {
         }
     }
 
+    @Override
     @PostMapping("/successful")
     public void deliverySuccessful(@RequestBody UUID deliveryId) {
         try {
@@ -40,6 +44,7 @@ public class DeliveryController {
         }
     }
 
+    @Override
     @PostMapping("/picked")
     public void deliveryPicked(@RequestBody UUID deliveryId) {
         try {
@@ -51,6 +56,7 @@ public class DeliveryController {
         }
     }
 
+    @Override
     @PostMapping("/failed")
     public void deliveryFailed(@RequestBody UUID deliveryId) {
         try {
@@ -62,6 +68,7 @@ public class DeliveryController {
         }
     }
 
+    @Override
     @PostMapping("/cost")
     public Double deliveryCost(@RequestBody @Valid OrderDto orderDto) {
         try {

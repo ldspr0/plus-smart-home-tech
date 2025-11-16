@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import ru.yandex.practicum.interactionapi.enums.PaymentState;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
@@ -20,10 +21,10 @@ public class Payment {
     private UUID paymentId;
     @NotNull
     private UUID orderId;
-    private double productsTotal;
-    private double deliveryTotal;
-    private double totalPayment;
-    private double feeTotal;
+    private BigDecimal productsTotal;
+    private BigDecimal deliveryTotal;
+    private BigDecimal totalPayment;
+    private BigDecimal feeTotal;
     @Enumerated(EnumType.STRING)
     private PaymentState status;
 }

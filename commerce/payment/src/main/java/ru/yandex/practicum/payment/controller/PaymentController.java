@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.interactionapi.dto.OrderDto;
 import ru.yandex.practicum.interactionapi.dto.PaymentDto;
+import ru.yandex.practicum.interactionapi.interfaces.PaymentOperations;
 import ru.yandex.practicum.payment.service.PaymentService;
 
 import java.util.UUID;
@@ -17,10 +18,11 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/payment")
 @RequiredArgsConstructor
-public class PaymentController {
+public class PaymentController implements PaymentOperations {
 
     private final PaymentService paymentService;
 
+    @Override
     @PostMapping
     public PaymentDto createPayment(@RequestBody @Valid OrderDto orderDto) {
         try {
@@ -32,6 +34,7 @@ public class PaymentController {
         }
     }
 
+    @Override
     @PostMapping("/totalCost")
     public Double getTotalCost(@RequestBody @Valid OrderDto orderDto) {
         try {
@@ -43,6 +46,7 @@ public class PaymentController {
         }
     }
 
+    @Override
     @PostMapping("/refund")
     public void paymentRefund(@RequestBody UUID orderId) {
         try {
@@ -54,6 +58,7 @@ public class PaymentController {
         }
     }
 
+    @Override
     @PostMapping("/productCost")
     public Double productCost(@RequestBody @Valid OrderDto orderDto) {
         try {
@@ -65,6 +70,7 @@ public class PaymentController {
         }
     }
 
+    @Override
     @PostMapping("/failed")
     public void paymentFailed(@RequestBody UUID orderId) {
         try {

@@ -1,0 +1,50 @@
+package ru.yandex.practicum.interactionapi.interfaces;
+
+import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.interactionapi.dto.OrderDto;
+import ru.yandex.practicum.interactionapi.request.CreateNewOrderRequest;
+import ru.yandex.practicum.interactionapi.request.ProductReturnRequest;
+
+import java.util.List;
+import java.util.UUID;
+
+public interface OrderOperations {
+    @GetMapping
+    List<OrderDto> getClientOrders(@RequestParam String username,
+                                   @RequestParam(defaultValue = "0") Integer page,
+                                   @RequestParam(defaultValue = "10") Integer size);
+
+    @PutMapping
+    OrderDto createNewOrder(@RequestBody @Valid CreateNewOrderRequest newOrderRequest);
+
+    @PostMapping("/return")
+    OrderDto productReturn(@RequestBody @Valid ProductReturnRequest returnRequest);
+
+    @PostMapping("/payment")
+    OrderDto payment(@RequestBody UUID orderId);
+
+    @PostMapping("/payment/failed")
+    OrderDto paymentFailed(@RequestBody UUID orderId);
+
+    @PostMapping("/delivery")
+    OrderDto delivery(@RequestBody UUID orderId);
+
+    @PostMapping("/delivery/failed")
+    OrderDto deliveryFailed(@RequestBody UUID orderId);
+
+    @PostMapping("/completed")
+    OrderDto complete(@RequestBody UUID orderId);
+
+    @PostMapping("/calculate/total")
+    OrderDto calculateTotalCost(@RequestBody UUID orderId);
+
+    @PostMapping("/calculate/delivery")
+    OrderDto calculateDeliveryCost(@RequestBody UUID orderId);
+
+    @PostMapping("/assembly")
+    OrderDto assembly(@RequestBody UUID orderId);
+
+    @PostMapping("/assembly/failed")
+    OrderDto assemblyFailed(@RequestBody UUID orderId);
+}

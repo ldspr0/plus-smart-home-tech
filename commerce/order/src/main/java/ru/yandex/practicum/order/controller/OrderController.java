@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.interactionapi.dto.OrderDto;
+import ru.yandex.practicum.interactionapi.interfaces.OrderOperations;
 import ru.yandex.practicum.interactionapi.request.CreateNewOrderRequest;
 import ru.yandex.practicum.interactionapi.request.ProductReturnRequest;
 import ru.yandex.practicum.order.service.OrderService;
@@ -16,10 +17,11 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/order")
 @RequiredArgsConstructor
-public class OrderController {
+public class OrderController implements OrderOperations {
 
     private final OrderService orderService;
 
+    @Override
     @GetMapping
     public List<OrderDto> getClientOrders(@RequestParam String username,
                                           @RequestParam(defaultValue = "0") Integer page,
@@ -33,6 +35,7 @@ public class OrderController {
         }
     }
 
+    @Override
     @PutMapping
     public OrderDto createNewOrder(@RequestBody @Valid CreateNewOrderRequest newOrderRequest) {
         try {
@@ -44,6 +47,7 @@ public class OrderController {
         }
     }
 
+    @Override
     @PostMapping("/return")
     public OrderDto productReturn(@RequestBody @Valid ProductReturnRequest returnRequest) {
         try {
@@ -55,6 +59,7 @@ public class OrderController {
         }
     }
 
+    @Override
     @PostMapping("/payment")
     public OrderDto payment(@RequestBody UUID orderId) {
         try {
@@ -66,6 +71,7 @@ public class OrderController {
         }
     }
 
+    @Override
     @PostMapping("/payment/failed")
     public OrderDto paymentFailed(@RequestBody UUID orderId) {
         try {
@@ -77,6 +83,7 @@ public class OrderController {
         }
     }
 
+    @Override
     @PostMapping("/delivery")
     public OrderDto delivery(@RequestBody UUID orderId) {
         try {
@@ -88,6 +95,7 @@ public class OrderController {
         }
     }
 
+    @Override
     @PostMapping("/delivery/failed")
     public OrderDto deliveryFailed(@RequestBody UUID orderId) {
         try {
@@ -99,6 +107,7 @@ public class OrderController {
         }
     }
 
+    @Override
     @PostMapping("/completed")
     public OrderDto complete(@RequestBody UUID orderId) {
         try {
@@ -110,6 +119,7 @@ public class OrderController {
         }
     }
 
+    @Override
     @PostMapping("/calculate/total")
     public OrderDto calculateTotalCost(@RequestBody UUID orderId) {
         try {
@@ -121,6 +131,7 @@ public class OrderController {
         }
     }
 
+    @Override
     @PostMapping("/calculate/delivery")
     public OrderDto calculateDeliveryCost(@RequestBody UUID orderId) {
         try {
@@ -132,6 +143,7 @@ public class OrderController {
         }
     }
 
+    @Override
     @PostMapping("/assembly")
     public OrderDto assembly(@RequestBody UUID orderId) {
         try {
@@ -143,6 +155,7 @@ public class OrderController {
         }
     }
 
+    @Override
     @PostMapping("/assembly/failed")
     public OrderDto assemblyFailed(@RequestBody UUID orderId) {
         try {
