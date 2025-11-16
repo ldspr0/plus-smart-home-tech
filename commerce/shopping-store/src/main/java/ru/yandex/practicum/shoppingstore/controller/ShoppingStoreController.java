@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.interactionapi.dto.PageableDto;
 import ru.yandex.practicum.interactionapi.enums.QuantityState;
+import ru.yandex.practicum.interactionapi.interfaces.ShoppingStoreOperations;
 import ru.yandex.practicum.interactionapi.request.SetProductQuantityStateRequest;
 import ru.yandex.practicum.interactionapi.dto.ProductDto;
 import ru.yandex.practicum.interactionapi.enums.ProductCategory;
@@ -21,10 +22,11 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/shopping-store")
 @RequiredArgsConstructor
-public class ShoppingStoreController {
+public class ShoppingStoreController implements ShoppingStoreOperations {
 
     private final ShoppingStoreService shoppingStoreService;
 
+    @Override
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Page<ProductDto> getProducts(@RequestParam(name = "category") ProductCategory productCategory,
@@ -33,6 +35,7 @@ public class ShoppingStoreController {
         return shoppingStoreService.getProducts(productCategory, pageableDto);
     }
 
+    @Override
     @PutMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ProductDto createNewProduct(@RequestBody @Valid ProductDto productDto) {
@@ -40,6 +43,7 @@ public class ShoppingStoreController {
         return shoppingStoreService.createNewProduct(productDto);
     }
 
+    @Override
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
     public ProductDto updateProduct(@RequestBody @Valid ProductDto productDto) {
@@ -47,6 +51,7 @@ public class ShoppingStoreController {
         return shoppingStoreService.updateProduct(productDto);
     }
 
+    @Override
     @PostMapping("/removeProductFromStore")
     @ResponseStatus(HttpStatus.OK)
     public Boolean removeProductFromStore(@RequestBody @NotNull UUID productId) {
@@ -54,6 +59,7 @@ public class ShoppingStoreController {
         return shoppingStoreService.removeProductFromStore(productId);
     }
 
+    @Override
     @PostMapping("/quantityState")
     @ResponseStatus(HttpStatus.OK)
     public Boolean setProductQuantityState(@RequestBody(required = false) SetProductQuantityStateRequest setProductQuantityStateRequest,
@@ -66,6 +72,7 @@ public class ShoppingStoreController {
         return shoppingStoreService.setProductQuantityState(request);
     }
 
+    @Override
     @GetMapping("/{productId}")
     @ResponseStatus(HttpStatus.OK)
     public ProductDto getProduct(@PathVariable @NotNull UUID productId) {

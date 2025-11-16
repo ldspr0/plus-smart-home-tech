@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.interactionapi.dto.BookedProductsDto;
+import ru.yandex.practicum.interactionapi.interfaces.ShoppingCartOperations;
 import ru.yandex.practicum.interactionapi.request.ChangeProductQuantityRequest;
 import ru.yandex.practicum.interactionapi.dto.ShoppingCartDto;
 import ru.yandex.practicum.shoppingcart.service.ShoppingCartService;
@@ -18,9 +19,10 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/shopping-cart")
 @RequiredArgsConstructor
-public class ShoppingCartController {
+public class ShoppingCartController implements ShoppingCartOperations {
     private final ShoppingCartService shoppingCartService;
 
+    @Override
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public ShoppingCartDto getShoppingCart(@RequestParam String username) {
@@ -28,6 +30,7 @@ public class ShoppingCartController {
         return shoppingCartService.getShoppingCart(username);
     }
 
+    @Override
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
     public ShoppingCartDto addProductToShoppingCart(@RequestParam String username,
@@ -36,6 +39,7 @@ public class ShoppingCartController {
         return shoppingCartService.addProductToShoppingCart(username, request);
     }
 
+    @Override
     @DeleteMapping
     @ResponseStatus(HttpStatus.OK)
     public void deactivateCurrentShoppingCart(@RequestParam String username) {
@@ -43,6 +47,7 @@ public class ShoppingCartController {
         shoppingCartService.deactivateCurrentShoppingCart(username);
     }
 
+    @Override
     @PostMapping("/remove")
     @ResponseStatus(HttpStatus.OK)
     public ShoppingCartDto removeFromShoppingCart(@RequestParam String username,
@@ -51,6 +56,7 @@ public class ShoppingCartController {
         return shoppingCartService.removeFromShoppingCart(username, request);
     }
 
+    @Override
     @PostMapping("/change-quantity")
     @ResponseStatus(HttpStatus.OK)
     public ShoppingCartDto changeProductQuantity(@RequestParam String username,
@@ -59,6 +65,7 @@ public class ShoppingCartController {
         return shoppingCartService.changeProductQuantity(username, requestDto);
     }
 
+    @Override
     @PostMapping("/booking")
     @ResponseStatus(HttpStatus.CREATED)
     public BookedProductsDto bookingProducts(@RequestParam String username) {
