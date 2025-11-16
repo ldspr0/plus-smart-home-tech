@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import ru.yandex.practicum.interactionapi.enums.OrderState;
 
+import java.math.BigDecimal;
 import java.util.Map;
 import java.util.UUID;
 
@@ -31,7 +32,7 @@ public class Order {
     private double deliveryWeight;
     private double deliveryVolume;
     private boolean fragile;
-    private double totalPrice;
-    private double deliveryPrice;
-    private double productPrice;
+    private BigDecimal totalPrice;
+    private BigDecimal deliveryPrice;
+    private BigDecimal productPrice;
 }

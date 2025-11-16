@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.interactionapi.dto.DeliveryDto;
 import ru.yandex.practicum.interactionapi.dto.OrderDto;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 public interface DeliveryOperations {
@@ -24,5 +25,5 @@ public interface DeliveryOperations {
     void deliveryFailed(@RequestBody UUID deliveryId);
 
     @PostMapping("/cost")
-    Double deliveryCost(@RequestBody @Valid OrderDto orderDto);
+    BigDecimal deliveryCost(@RequestBody @Valid OrderDto orderDto);
 }

@@ -37,10 +37,10 @@ public class PaymentServiceImpl implements PaymentService {
         checkOrder(orderDto);
         Payment payment = Payment.builder()
                 .orderId(orderDto.getOrderId())
-                .totalPayment(convertToBigDecimal(orderDto.getTotalPrice()))
-                .deliveryTotal(convertToBigDecimal(orderDto.getDeliveryPrice()))
-                .productsTotal(convertToBigDecimal(orderDto.getProductPrice()))
-                .feeTotal(getTax(convertToBigDecimal(orderDto.getTotalPrice())))
+                .totalPayment(orderDto.getTotalPrice())
+                .deliveryTotal(orderDto.getDeliveryPrice())
+                .productsTotal(orderDto.getProductPrice())
+                .feeTotal(getTax(orderDto.getTotalPrice()))
                 .status(PaymentState.PENDING)
                 .build();
         return paymentMapper.toPaymentDto(paymentRepository.save(payment));
@@ -53,8 +53,8 @@ public class PaymentServiceImpl implements PaymentService {
             throw new NotEnoughInfoInOrderToCalculateException(MESSAGE_NOT_INFORMATION);
         }
 
-        BigDecimal productPrice = convertToBigDecimal(orderDto.getProductPrice());
-        BigDecimal deliveryPrice = convertToBigDecimal(orderDto.getDeliveryPrice());
+        BigDecimal productPrice = orderDto.getProductPrice();
+        BigDecimal deliveryPrice = orderDto.getDeliveryPrice();
         BigDecimal tax = getTax(productPrice);
 
         return productPrice.add(tax).add(deliveryPrice);
@@ -72,22 +72,23 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional(readOnly = true)
     public BigDecimal productCost(OrderDto orderDto) {
         Map<UUID, Long> products = orderDto.getProducts();
-        if (products == null) {
+        if (products == null || products.isEmpty()) {
             throw new NotEnoughInfoInOrderToCalculateException(MESSAGE_NOT_INFORMATION);
         }
 
-        BigDecimal totalCost = BigDecimal.ZERO;
+        BigDecimal productCost = BigDecimal.ZERO;
 
         for (Map.Entry<UUID, Long> entry : products.entrySet()) {
             ProductDto product = shoppingStoreClient.getProduct(entry.getKey());
-            BigDecimal productPrice = convertToBigDecimal(product.getPrice());
+
+            BigDecimal productPrice = product.getPrice();
             BigDecimal quantity = BigDecimal.valueOf(entry.getValue());
 
             BigDecimal productTotal = productPrice.multiply(quantity);
-            totalCost = totalCost.add(productTotal);
+            productCost = productCost.add(productTotal);
         }
 
-        return totalCost;
+        return productCost;
     }
 
     @Override
@@ -118,7 +119,4 @@ public class PaymentServiceImpl implements PaymentService {
         return totalPrice.multiply(taxRate);
     }
 
-    private BigDecimal convertToBigDecimal(Double value) {
-        return value != null ? BigDecimal.valueOf(value) : BigDecimal.ZERO;
-    }
 }

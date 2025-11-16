@@ -15,6 +15,7 @@ import ru.yandex.practicum.interactionapi.feign.OrderClient;
 import ru.yandex.practicum.interactionapi.feign.WarehouseClient;
 import ru.yandex.practicum.interactionapi.request.ShippedToDeliveryRequest;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Service
@@ -27,7 +28,11 @@ public class DeliveryServiceImpl implements DeliveryService {
     private final OrderClient orderClient;
     private final WarehouseClient warehouseClient;
 
-    private static final double BASERATE = 5.0;
+    private static final BigDecimal BASERATE = new BigDecimal("5.0");
+    private static final BigDecimal FRAGILE_SURCHARGE_RATE = new BigDecimal("0.20");
+    private static final BigDecimal WEIGHT_RATE = new BigDecimal("0.30");
+    private static final BigDecimal VOLUME_RATE = new BigDecimal("0.20");
+    private static final BigDecimal STREET_SURCHARGE_RATE = new BigDecimal("0.20");
     private static final String ADDRESS1 = "ADDRESS_1";
     private static final String ADDRESS2 = "ADDRESS_2";
     private final String MESSAGE_DELIVERY_NOT_FOUND = "Delivery is not found.";
@@ -68,25 +73,37 @@ public class DeliveryServiceImpl implements DeliveryService {
 
     @Override
     @Transactional(readOnly = true)
-    public Double deliveryCost(OrderDto orderDto) {
+    public BigDecimal deliveryCost(OrderDto orderDto) {
         Delivery delivery = deliveryRepository.findByOrderId(orderDto.getOrderId()).orElseThrow(
                 () -> new NoDeliveryFoundException(MESSAGE_DELIVERY_NOT_FOUND));
 
         AddressDto warehouseAddress = warehouseClient.getWarehouseAddress();
 
-        double addressCost = switch (warehouseAddress.getCity()) {
-            case ADDRESS1 -> BASERATE * 1;
-            case ADDRESS2 -> BASERATE * 2;
+        BigDecimal addressCost = switch (warehouseAddress.getCity()) {
+            case ADDRESS1 -> BASERATE;
+            case ADDRESS2 -> BASERATE.multiply(new BigDecimal("2"));
             default ->
                     throw new IllegalStateException(String.format("Unexpected value: %s", warehouseAddress.getCity()));
         };
-        double deliveryCost = BASERATE + addressCost;
-        if (orderDto.getFragile()) deliveryCost += deliveryCost * 0.2;
-        deliveryCost += orderDto.getDeliveryWeight() * 0.3;
-        deliveryCost += orderDto.getDeliveryVolume() * 0.2;
-        if (!warehouseAddress.getStreet().equals(delivery.getToAddress().getStreet())) {
-            deliveryCost += deliveryCost * 0.2;
+
+        BigDecimal deliveryCost = BASERATE.add(addressCost);
+
+        if (orderDto.getFragile()) {
+            deliveryCost = deliveryCost.add(deliveryCost.multiply(FRAGILE_SURCHARGE_RATE));
         }
+
+        deliveryCost = deliveryCost.add(
+                BigDecimal.valueOf(orderDto.getDeliveryWeight()).multiply(WEIGHT_RATE)
+        );
+
+        deliveryCost = deliveryCost.add(
+                BigDecimal.valueOf(orderDto.getDeliveryVolume()).multiply(VOLUME_RATE)
+        );
+
+        if (!warehouseAddress.getStreet().equals(delivery.getToAddress().getStreet())) {
+            deliveryCost = deliveryCost.add(deliveryCost.multiply(STREET_SURCHARGE_RATE));
+        }
+
         return deliveryCost;
     }
 }

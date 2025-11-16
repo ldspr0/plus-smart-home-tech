@@ -8,9 +8,9 @@ create table if not exists orders
     delivery_weight  double precision,
     delivery_volume  double precision,
     fragile          boolean,
-    total_price      double precision,
-    delivery_price   double precision,
-    product_price    double precision
+    total_price      numeric(19,4),
+    delivery_price   numeric(19,4),
+    product_price    numeric(19,4)
 );
 
 create table if not exists order_items
